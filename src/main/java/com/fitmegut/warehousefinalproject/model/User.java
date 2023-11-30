@@ -1,8 +1,10 @@
 package com.fitmegut.warehousefinalproject.model;
 
+import java.util.Objects;
+
 public class User {
 
-	private Long id;
+	private long id; // To generated using spring
 	private String firstName;
 	private String lastName;
 	private String nickname;
@@ -16,8 +18,10 @@ public class User {
 	private String userType; // Private or company
 	private String password;
 
-	public User(String firstName, String lastName, String nickname, String dateOfbirth, String gender, String email,
-			String phoneNumber, String country, String city, String address, String userType, String password) {
+	public User(long id, String firstName, String lastName, String nickname, String dateOfbirth, String gender,
+			String email, String phoneNumber, String country, String city, String address, String userType,
+			String password) {
+		this.id = id; // To removed after spring features implemented
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.nickname = nickname;
@@ -36,7 +40,7 @@ public class User {
 
 	}
 
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -138,6 +142,25 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	// For implementation whithout spring features
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(email, id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		return Objects.equals(email, other.email) && Objects.equals(id, other.id);
 	}
 
 }

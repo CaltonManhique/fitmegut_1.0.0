@@ -1,0 +1,20 @@
+
+	      ﬁtMegut – Clothing donation & exchange
+
+	Nothing is old, it's all about how you look at things	
+	
+	1. PROFILE 
+		5. Settings *
+		6. Log out
+	
+	2. Wardrobe
+		 7. Add item
+		 8. Post item for exchange**
+		 9. Donate item *
+		10. Remove item  
+	
+	3. Donate * 
+	4. Exchange * 
+	
+	*To be implemented
+	**To be completed
