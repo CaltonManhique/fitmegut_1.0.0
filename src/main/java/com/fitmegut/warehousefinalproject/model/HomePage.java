@@ -35,9 +35,12 @@ public class HomePage {
 
 				try {
 					String str = registration.regist();
-					System.out.println(str);
 
-					System.out.println("Sign in to access more features.");
+					if (str.equalsIgnoreCase("success")) {
+
+						System.out.println(str + " str");
+						System.out.println("Sign in to access more features.");
+					}
 
 				} catch (RegistrationException | EmailException e) {
 					System.out.println(e.getMessage());
