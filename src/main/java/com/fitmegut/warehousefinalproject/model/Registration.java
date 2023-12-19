@@ -1,6 +1,7 @@
 package com.fitmegut.warehousefinalproject.model;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -8,87 +9,100 @@ import java.util.Set;
 import com.fitmegut.warehousefinalproject.exception.EmailException;
 import com.fitmegut.warehousefinalproject.exception.RegistrationException;
 import com.fitmegut.warehousefinalproject.exception.Validations;
+import com.fitmegut.warehousefinalproject.service.DbConnections;
 import com.opencsv.exceptions.CsvValidationException;
 
 public class Registration {
 
-	private Set<User> users;
-	private FileReaderAndWriter fileReaderAndWriter;
+//	private Set<User> users;
+//	private FileReaderAndWriter fileReaderAndWriter;
 	private Scanner scanner = new Scanner(System.in);
 	private Validations validations = new Validations();
+
+	private DbConnections dbConnections;
 
 	private Long id = 1000L;
 
 	public Registration() {
-		users = new HashSet<User>();
-		fileReaderAndWriter = new FileReaderAndWriter();
+//		users = new HashSet<User>();
+//		fileReaderAndWriter = new FileReaderAndWriter();
+		dbConnections = new DbConnections();
 	}
 
 	private final String fileName = "users.csv";
 
-	public boolean checkEmail(String email) throws RegistrationException {
-		boolean doesntExists = true;
+	// csv version
+//	public boolean checkEmail(String email) throws RegistrationException {
+//		boolean doesntExists = true;
+//
+//		// Db select to the users table
+//		for (User user : users) {
+//			if (user.getEmail().equalsIgnoreCase(email))
+//				doesntExists = false;
+//		}
+//
+//		if (!doesntExists) {
+//			throw new RegistrationException("User already registered with this email.");
+//		}
+//		return doesntExists;
+//	}
 
-		for (User user : users) {
-			if (user.getEmail().equalsIgnoreCase(email))
-				doesntExists = false;
-		}
+	// csv version
+//	public long idGenerator() {
+//		return users.isEmpty() ? id : id + 1;
+//	}
 
-		if (!doesntExists) {
-			throw new RegistrationException("User already registered with this email.");
-		}
-		return doesntExists;
-	}
+	// csv version
+//	public Long getLastId() {
+//		return users.stream().mapToLong(User::getId).max().orElse(0);
+//	}
 
-	// Will be replaced by spring features
-	public long idGenerator() {
-		return users.isEmpty() ? id : id + 1;
-	}
-
-	public Long getLastId() {
-		return users.stream().mapToLong(User::getId).max().orElse(0);
-	}
-
-	public String saveUser(String firstName, String lastName, String nickname, String dateOfbirth, String gender,
-			String email, String phoneNumber, String country, String city, String address, String userType,
-			String password) {
-
-		String status = "";
-
-		try {
-
-			if (checkEmail(email)) {
-
-				User user = new User(idGenerator(), firstName, lastName, nickname, dateOfbirth, gender, email,
-						phoneNumber, country, city, address, userType, password);
-				users.add(user);
-
-				// DB
-				fileReaderAndWriter.fileWriterUser(user, fileName);
-
-				status = "User successfully registered!!";
-
-			}
-
-		} catch (RegistrationException e) {
-			status = "Error: " + e.getMessage();
-		} catch (IOException e) {
-			status = "Error: " + e.getMessage();
-		}
-
-		return status;
-
-	}
+//	// csv version
+//	public String saveUser(String firstName, String lastName, String nickname, String dateOfbirth, String gender,
+//			String email, String phoneNumber, String country, String city, String address, String userType,
+//			String password) {
+//
+//		String status = "";
+//
+//		try {
+//
+//			if (checkEmail(email)) {
+//
+//				User user = new User(idGenerator(), firstName, lastName, nickname, dateOfbirth, gender, email,
+//						phoneNumber, country, city, address, userType, password);
+//				users.add(user);
+//
+//				// DB
+//				fileReaderAndWriter.fileWriterUser(user, fileName);
+//
+//				status = "User successfully registered!!";
+//
+//			}
+//
+//		} catch (RegistrationException e) {
+//			status = "Error: " + e.getMessage();
+//		} catch (IOException e) {
+//			status = "Error: " + e.getMessage();
+//		}
+//
+//		return status;
+//
+//	}
 
 	public String regist() throws RegistrationException, EmailException {
 
-		try {
+//		//csv version
+//		try {
+//
+//			// DB
+////			users = fileReaderAndWriter.fileReaderUser(fileName); // Temporary db
+//			// id = getLastId();
+//
+//		} catch (CsvValidationException | IOException e) {
+//
+//		}
 
-			users = fileReaderAndWriter.fileReaderUser(fileName); // Temporary db
-			id = getLastId();
-
-		} catch (CsvValidationException | IOException e) {
-		}
+		String registrationStatus = "";
 
 		// Stub
 		System.out.println("Enter first name:");
@@ -137,8 +151,13 @@ public class Registration {
 
 		} while (!validations.validatePassword(password));
 
-		return saveUser(firstName, lastName, nickname, dateOfBirth, gender, email, numberPhone, country, city, address,
-				userType, password);
+		try {
+			registrationStatus = dbConnections.saveUser(firstName, lastName, nickname, dateOfBirth, gender, email,
+					numberPhone, country, city, address, userType, password);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
+		return registrationStatus;
 	}
 }
