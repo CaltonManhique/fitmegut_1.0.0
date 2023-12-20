@@ -89,6 +89,7 @@ public class Registration {
 //
 //	}
 
+	// returns success or Error
 	public String regist() throws RegistrationException, EmailException {
 
 //		//csv version
