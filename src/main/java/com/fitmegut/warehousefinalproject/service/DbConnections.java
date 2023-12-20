@@ -21,13 +21,13 @@ public class DbConnections {
 	private String insertUserStatement = "INSERT INTO fitmegut.users(first_name,last_name,nickname,date_of_birth,gender,email,number_phone,\n"
 			+ "country,city,address,user_type,password)\n" + "VALUES(?,?,?,?,?,?,?,?,?,\n" + "?,?,?)";
 
-	private String selectToCheckEmail = "select email from users where email=?";
+	private String selectToCheckEmail = "select email from fitmegut.users where email=?";
 
 	public void dbConnect() throws SQLException {
 
 		myConn = DriverManager.getConnection(dbUrl, user, pass);
 
-		System.out.println("Database connection successfully!\n");
+		System.out.println("Database connected successfully!\n");
 
 	}
 
@@ -40,7 +40,9 @@ public class DbConnections {
 		try {
 
 			try {
-				if (checkEmail(email)) {
+				if (checkEmail(email) == null) {
+
+					dbConnect();
 
 					myStmt = myConn.prepareStatement(insertUserStatement);
 
@@ -58,6 +60,8 @@ public class DbConnections {
 					myStmt.setString(12, password);
 
 					int rowsAffected = myStmt.executeUpdate();
+
+					System.out.println(rowsAffected + " ggka");
 
 					status = rowsAffected > 0 ? "success" : "Error";
 				}
@@ -87,19 +91,24 @@ public class DbConnections {
 	}
 
 	// If used alone, close myStmt, myRs and myConn.
-	public boolean checkEmail(String email) throws RegistrationException, SQLException {
-		boolean doesntExists = true;
-
+	public String checkEmail(String email) throws RegistrationException, SQLException {
 		dbConnect();
+
+		String result = null;
 
 		myStmt = myConn.prepareStatement(selectToCheckEmail);
 		myStmt.setString(1, email);
 
 		myRs = myStmt.executeQuery();
 
-		if (myRs != null) {
+		while (myRs.next()) {
+			result = myRs.getString("email");
+		}
+
+		if (result != null) {
 			throw new RegistrationException("User already registered with this email.");
 		}
-		return doesntExists;
+
+		return result;
 	}
 }
