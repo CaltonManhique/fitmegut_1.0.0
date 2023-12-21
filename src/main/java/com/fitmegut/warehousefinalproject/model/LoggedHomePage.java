@@ -20,7 +20,7 @@ public class LoggedHomePage {
 		logOff = new LogOff();
 	}
 
-	public void loggedMember(long sessionID, long userID) throws IOException {
+	public void loggedMember(long sessionID) throws IOException {
 
 		Files.lines(Paths.get(homepageAfterLogin)).forEach(System.out::println);
 
@@ -51,7 +51,8 @@ public class LoggedHomePage {
 				option = scanner.nextInt();
 
 				switch (option) {
-				case 7 -> wardrobeFactory.addItemToTheWardrobe(userID);
+				case 7 -> wardrobeFactory.addItemToTheWardrobe(sessionID); // change method to accept sessionID instead
+																			// of userID
 
 				case 8 -> {
 					System.out.println("Enter item id:");
