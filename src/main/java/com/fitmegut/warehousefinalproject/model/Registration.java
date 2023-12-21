@@ -1,16 +1,16 @@
 package com.fitmegut.warehousefinalproject.model;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashSet;
+//import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
+//import java.util.Set;
 
 import com.fitmegut.warehousefinalproject.exception.EmailException;
 import com.fitmegut.warehousefinalproject.exception.RegistrationException;
 import com.fitmegut.warehousefinalproject.exception.Validations;
 import com.fitmegut.warehousefinalproject.service.DbConnections;
-import com.opencsv.exceptions.CsvValidationException;
+//import com.opencsv.exceptions.CsvValidationException;
 
 public class Registration {
 
@@ -21,7 +21,7 @@ public class Registration {
 
 	private DbConnections dbConnections;
 
-	private Long id = 1000L;
+//	private Long id = 1000L;
 
 	public Registration() {
 //		users = new HashSet<User>();
@@ -29,7 +29,7 @@ public class Registration {
 		dbConnections = new DbConnections();
 	}
 
-	private final String fileName = "users.csv";
+//	private final String fileName = "users.csv";
 
 	// csv version
 //	public boolean checkEmail(String email) throws RegistrationException {

@@ -38,8 +38,10 @@ public class HomePage {
 
 					if (str.equalsIgnoreCase("success")) {
 
-						System.out.println(str + " str");
+						System.out.println(str);
 						System.out.println("Sign in to access more features.");
+					} else {
+						System.out.println(str);
 					}
 
 				} catch (RegistrationException | EmailException e) {
