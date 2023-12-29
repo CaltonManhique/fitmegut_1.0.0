@@ -27,10 +27,12 @@ public class DbConnections {
 	private String insertUserStatement = "INSERT INTO fitmegut.users(first_name,last_name,nickname,date_of_birth,gender,email,number_phone,\n"
 			+ "country,city,address,user_type,password)\n" + "VALUES(?,?,?,?,?,?,?,?,?,\n" + "?,?,?)";
 
-	private String selectToCheckEmail = "select * from fitmegut.users where email=?";
+	private String selectToCheckEmail = "SELECT * FROM fitmegut.users WHERE email=?";
 
 	private String insertSessionLogin = "INSERT INTO fitmegut.session_login(user_id,email,date,time,session_status)\n"
 			+ "VALUES(?,?,?,?,?)";
+
+	private String updateSessionLogOff = "UPDATE fitmegut.session_login SET date = ?, time = ?, session_status = false WHERE id = ?";
 
 	public void dbConnect() throws SQLException {
 
@@ -187,5 +189,39 @@ public class DbConnections {
 		}
 
 		return sessionID;
+	}
+
+	public boolean logOff(long id) throws SQLException {
+
+		boolean isLoggedOff = false;
+
+		try {
+
+			dbConnect();
+
+			myStmt = myConn.prepareStatement(updateSessionLogOff);
+
+			myStmt.setString(1, LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+			myStmt.setString(2, LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+			myStmt.setLong(3, id);
+
+			int rowsAffected = myStmt.executeUpdate();
+
+			isLoggedOff = rowsAffected > 0 ? true : false;
+
+		} catch (SQLException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+
+			if (myStmt != null) {
+				myStmt.close();
+			}
+
+			if (myConn != null) {
+				myConn.close();
+			}
+		}
+
+		return isLoggedOff;
 	}
 }
