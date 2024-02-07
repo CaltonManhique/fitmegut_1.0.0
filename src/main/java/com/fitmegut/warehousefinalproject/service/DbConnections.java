@@ -25,7 +25,7 @@ public class DbConnections {
 
 	private final static String dbUrl = "jdbc:mysql://localhost:3306/fitmegut";
 	private final static String user = "root";
-	private final static String pass = "1234";
+	private final static String pass = "password";
 
 	private String insertUserStatement = "INSERT INTO fitmegut.users(first_name,last_name,nickname,date_of_birth,gender,email,number_phone,\n"
 			+ "country,city,address,user_type,password)\n" + "VALUES(?,?,?,?,?,?,?,?,?,\n" + "?,?,?)";
