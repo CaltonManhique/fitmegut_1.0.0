@@ -107,22 +107,6 @@ public class Login {
 
 	public void login() throws EmailException, IOException {
 
-		// csv version
-//		try {
-//
-//			users = fileReaderAndWriter.fileReaderUser(userFileName);
-//			logins = fileReaderAndWriter.fileReaderSession(sessionFileName);
-//
-//			sessionID = getLastSessionID();
-//
-//		} catch (CsvValidationException | IOException e) {
-//		}
-
-		// csv version
-//		String loginStatus = "";
-
-		long sessionID = 0;
-
 		String email = null;
 		do {
 
@@ -134,36 +118,16 @@ public class Login {
 		System.out.println("Enter password:");
 		String password = scanner.nextLine();
 
-		// csv version
-//		currentSessionID = sessionIdGenerator();
-
-		// Check if user is already logged, if yes reuse the logged session id - feature
-
-		// csv version
-//		loginStatus = performLogin(currentSessionID, email, password, LocalDate.now(), LocalTime.now());
-
-//		if (loginStatus.equalsIgnoreCase("success")) {
-//			System.out.println("fitMegut member logged.");
-//
-//			long userID = getUser(email).getId();
-//
-//			// redirection to member home page
-//
-//			loggedHomePage.loggedMember(currentSessionID, userID);
-//
-//		} else {
-//			System.out.println(loginStatus);
-//		}
-
-		// DB version
 		try {
 
-			sessionID = dbConnections.performLogin(email, password);
+			long[] ids = dbConnections.performLogin(email, password);
+			long sessionID = ids[0];
+			long userID = ids[1];
 
 			if (sessionID > 0) {
 
 				// redirection to member home page
-				loggedHomePage.loggedMember(sessionID);
+				loggedHomePage.loggedMember(sessionID, userID);
 			} else {
 				System.out.println("Error: Problem occurred while login in. Please, try again.");
 			}

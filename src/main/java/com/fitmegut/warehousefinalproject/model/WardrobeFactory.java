@@ -3,32 +3,37 @@ package com.fitmegut.warehousefinalproject.model;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import com.fitmegut.warehousefinalproject.exception.Validations;
+import com.fitmegut.warehousefinalproject.service.DbConnections;
 import com.opencsv.exceptions.CsvValidationException;
 
 public class WardrobeFactory {
 
 	private final String wardrobeFileName = "wardrobe.csv";
 	private final String itemFileName = "items.csv";
-	private final String clothingCategoriesFile = "src/main/resources/static/categories.txt";
+	private final static String TXT_PATH = "src/main/resources/static/";
 
 	private List<Wardrobe> wardrobe;
 	private List<Item> items;
 
 	private Scanner scanner = new Scanner(System.in);
-	Validations validations = new Validations();
-	FileReaderAndWriter fileReaderAndWriter = new FileReaderAndWriter();
+	private Validations validations = new Validations();
+	private FileReaderAndWriter fileReaderAndWriter = new FileReaderAndWriter();
+
+	private DbConnections dbConnections;
 
 	private long wardrobeID = 10;
 	private long itemID = 10;
 
 	public WardrobeFactory() {
-		wardrobe = new ArrayList<Wardrobe>();
-		items = new ArrayList<Item>();
+//		wardrobe = new ArrayList<Wardrobe>();
+//		items = new ArrayList<Item>();
+		dbConnections = new DbConnections();
 	}
 
 	public long wardrobeIdGenerator() {
@@ -47,31 +52,25 @@ public class WardrobeFactory {
 		return items.stream().mapToLong(Item::getItemId).max().getAsLong();
 	}
 
-	private Item createItem(ClothingCategory clothingCategories, String itemBrand, String size, String color,
-			String status, String description) {
-		return new Item(itemIdGenerator(), clothingCategories, itemBrand, size, color, status, description);
-	}
+	// csv version
+//	private Item createItem(ClothingCategory clothingCategories, String itemBrand, String size, String color,
+//			String itemCondition, String description) {
+//		return new Item(itemIdGenerator(), clothingCategories, itemBrand, size, color, itemCondition, description);
+//	}
+//
+//	private Item createItem(String itemName, ClothingCategory clothingCategories, String itemBrand, String size,
+//			String color, String itemCondition, String description) {
+//		return new Item(itemIdGenerator(), itemName, clothingCategories, itemBrand, size, color, itemCondition,
+//				description);
+//	}
 
-	private Wardrobe createWardrobeEntry(long userID, long itemID, ClothingCategory clothingCategory,
-			String itemBrand) {
-		return new Wardrobe(wardrobeIdGenerator(), userID, itemID, clothingCategory, itemBrand, false);
-	}
+	private Item createItem() throws IOException, SQLException {
 
-	public void addItemToTheWardrobe(long userId) throws IOException {
-
-		try {
-
-			wardrobe = fileReaderAndWriter.fileReaderWardrobe(wardrobeFileName);
-			wardrobeID = getLastWardrobeID();
-
-			items = fileReaderAndWriter.fileReaderItem(itemFileName);
-			itemID = getLastItemID();
-
-		} catch (CsvValidationException | IOException e) {
-		}
+		System.out.println("Enter item name:");
+		String itemName = scanner.nextLine();
 
 		System.out.println("Select a category bellow:");
-		Files.lines(Paths.get(clothingCategoriesFile)).forEach(System.out::println); // Dropdown list
+		Files.lines(Paths.get(TXT_PATH + "categories.txt")).forEach(System.out::println); // Dropdown list
 
 		ClothingCategory category = switch (scanner.nextInt()) {
 		case 1 -> ClothingCategory.SWEATER;
@@ -101,24 +100,41 @@ public class WardrobeFactory {
 		System.out.println("Enter color:");
 		String color = scanner.nextLine(); // Mandatory field
 
-		System.out.println("Enter status (New/Used):");
-		String status = scanner.nextLine(); // Mandatory field
+		System.out.println("Select the item condition from the bellow list:");
+		Files.lines(Paths.get(TXT_PATH + "item_condition.txt")).forEach(System.out::println);
+		ItemCondition itemCondition = switch (scanner.nextInt()) {
+		case 1 -> ItemCondition.BRAND_NEW;
+		case 2 -> ItemCondition.NEW;
+		case 3 -> ItemCondition.EXCELLENT;
+		case 4 -> ItemCondition.GOOD;
+		case 5 -> ItemCondition.USED;
+		default -> throw new IllegalArgumentException("Unexpected value!!");
+		};
 
-		System.out.println("Enter description:");
+		scanner.nextLine();
+
+		System.out.println("Enter Notes:");
 		String description = scanner.nextLine();
 
-		Item addedItem = createItem(category, itemBrand, size, color, status, description);
-		items.add(addedItem);
+		return dbConnections.insertItem(itemName, category, itemBrand, size, color, itemCondition, description);
+	}
 
-		Wardrobe wardrobeEntry = createWardrobeEntry(userId, addedItem.getItemId(), addedItem.getClothingCategories(),
-				addedItem.getItemBrand());
+	public void addItemToTheWardrobe(long userId) throws IOException {
 
-		wardrobe.add(wardrobeEntry);
+		try {
+			Item item = createItem();
 
-		fileReaderAndWriter.fileWriterItem(addedItem, itemFileName);
-		fileReaderAndWriter.fileWriterWardrobe(wardrobeEntry, wardrobeFileName);
+			if (item == null) {
+				System.out.println("Item not found/created to be added to the wardrobe!!");
+			} else {
+				dbConnections.createWardrobeEntry(userId, item.getItemId(), item.getClothingCategories(),
+						item.getItemBrand(), item.isPosted());
+				System.out.println("Item added successfully to the wardrobe.");
+			}
 
-		System.out.println("Item added successfully to the wardrobe.");
+		} catch (IOException | SQLException e) {
+			System.out.println("Error: " + e.getMessage());
+		}
 	}
 
 	public void removeItemFromWardrobe(long wardrobeID, long itemID) {

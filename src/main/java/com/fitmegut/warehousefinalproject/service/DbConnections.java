@@ -12,6 +12,9 @@ import java.time.format.DateTimeFormatter;
 
 import com.fitmegut.warehousefinalproject.exception.LoginException;
 import com.fitmegut.warehousefinalproject.exception.RegistrationException;
+import com.fitmegut.warehousefinalproject.model.ClothingCategory;
+import com.fitmegut.warehousefinalproject.model.Item;
+import com.fitmegut.warehousefinalproject.model.ItemCondition;
 import com.fitmegut.warehousefinalproject.model.User;
 
 public class DbConnections {
@@ -34,6 +37,12 @@ public class DbConnections {
 
 	private String updateSessionLogOff = "UPDATE fitmegut.session_login SET date = ?, time = ?, session_status = false WHERE id = ?";
 
+	private String insertItem = "INSERT INTO fitmegut.items(item_name,clothing_category,item_brand,size,color,item_condition,description,posted)\n"
+			+ "VALUES(?,?,?,?,?,?,?,false)";
+
+	private String createWardrobeEntry = "INSERT INTO fitmegut.wardrobe(member_id,item_id,clothing_category,item_brand,posted)\n"
+			+ "VALUES(?,?,?,?,?);";
+
 	public void dbConnect() throws SQLException {
 
 		myConn = DriverManager.getConnection(dbUrl, user, pass);
@@ -51,6 +60,8 @@ public class DbConnections {
 
 		try {
 
+			dbConnect();
+
 			try {
 
 				user = checkEmail(email);
@@ -60,8 +71,6 @@ public class DbConnections {
 				}
 
 				else {
-
-					dbConnect();
 
 					myStmt = myConn.prepareStatement(insertUserStatement);
 
@@ -91,17 +100,15 @@ public class DbConnections {
 		} catch (SQLException e) {
 			status = "Error: " + e.getMessage();
 		} finally {
-			if (myRs != null) {
+			if (myRs != null)
 				myRs.close();
-			}
 
-			if (myStmt != null) {
+			if (myStmt != null)
 				myStmt.close();
-			}
 
-			if (myConn != null) {
+			if (myConn != null)
 				myConn.close();
-			}
+
 		}
 
 		return status;
@@ -110,7 +117,6 @@ public class DbConnections {
 
 	// If used alone, close myStmt, myRs and myConn.
 	public User checkEmail(String email) throws RegistrationException, SQLException {
-		dbConnect();
 
 		User result = null;
 
@@ -131,11 +137,13 @@ public class DbConnections {
 	}
 
 	// Returns session id
-	public long performLogin(String email, String password) throws SQLException, LoginException {
-		long sessionID = 0;
+	public long[] performLogin(String email, String password) throws SQLException, LoginException {
+		long[] ids = new long[2];
 		User user = null;
 
 		try {
+
+			dbConnect();
 
 			try {
 
@@ -146,8 +154,9 @@ public class DbConnections {
 				} else {
 
 					if (user.getPassword().equals(password)) {
-						dbConnect();
 
+						// Insert an entry to the session table and retrieve the entry's key with
+						// Statement.RETURN_GENERATED_KEYS
 						myStmt = myConn.prepareStatement(insertSessionLogin, Statement.RETURN_GENERATED_KEYS);
 
 						myStmt.setLong(1, user.getId());
@@ -160,7 +169,10 @@ public class DbConnections {
 						ResultSet rs = myStmt.getGeneratedKeys();
 
 						// If myStmt.executeUpdate() is success returns session id else 0;
-						sessionID = rs.next() ? rs.getLong(1) : 0;
+						long sessionID = rs.next() ? rs.getLong(1) : 0;
+						ids[0] = sessionID;
+						ids[1] = user.getId();
+
 					} else {
 
 						throw new LoginException("Password doesn't match!");
@@ -188,11 +200,10 @@ public class DbConnections {
 			}
 		}
 
-		return sessionID;
+		return ids;
 	}
 
 	public boolean logOff(long id) throws SQLException {
-
 		boolean isLoggedOff = false;
 
 		try {
@@ -223,5 +234,79 @@ public class DbConnections {
 		}
 
 		return isLoggedOff;
+	}
+
+	public Item insertItem(String itemName, ClothingCategory clothingCategories, String itemBrand, String size,
+			String color, ItemCondition itemCondition, String description) throws SQLException {
+
+		Item item = null;
+
+		try {
+			dbConnect();
+
+			myStmt = myConn.prepareStatement(insertItem, Statement.RETURN_GENERATED_KEYS);
+
+			myStmt.setString(1, itemName);
+			myStmt.setString(2, clothingCategories.toString());
+			myStmt.setString(3, itemBrand);
+			myStmt.setString(4, size);
+			myStmt.setString(5, color);
+			myStmt.setString(6, itemCondition.getMeaning());
+			myStmt.setString(7, description);
+
+			myStmt.executeUpdate();
+			ResultSet rs = myStmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				long itemID = rs.getLong(1);
+
+				item = new Item(itemID, itemName, clothingCategories, itemBrand, size, color, itemCondition,
+						description, false);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Error: " + e.getMessage());
+//		} finally {
+//			if (myRs != null)
+//				myRs.close();
+//
+//			if (myStmt != null)
+//				myStmt.close();
+//
+//			if (myConn != null)
+//				myConn.close();
+		}
+		return item;
+	}
+
+	public void createWardrobeEntry(long userId, long itemId, ClothingCategory clothingCategories, String itemBrand,
+			boolean posted) throws SQLException {
+
+		try {
+//			dbConnect();
+
+			myStmt = myConn.prepareStatement(createWardrobeEntry);
+
+			myStmt.setLong(1, userId);
+			myStmt.setLong(2, itemId);
+			myStmt.setString(3, clothingCategories.toString());
+			myStmt.setString(4, itemBrand);
+			myStmt.setBoolean(5, posted);
+
+			myStmt.executeUpdate();
+
+		} catch (SQLException e) {
+			System.out.println("Error: " + e.getMessage());
+		} finally {
+			if (myStmt != null)
+				myStmt.close();
+
+			if (myConn != null)
+				myConn.close();
+
+			if (myRs != null)
+				myRs.close();
+		}
+
 	}
 }
