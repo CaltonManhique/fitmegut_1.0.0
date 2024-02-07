@@ -9,7 +9,6 @@ public class LoggedHomePage {
 
 	private final String homepageAfterLogin = "src/main/resources/static/homepage_after_login.txt";
 
-//	private Registration registration; // To use in Settings
 	private WardrobeFactory wardrobeFactory;
 	private LogOff logOff;
 
@@ -20,7 +19,7 @@ public class LoggedHomePage {
 		logOff = new LogOff();
 	}
 
-	public void loggedMember(long sessionID) throws IOException {
+	public void loggedMember(long sessionID, long userID) throws IOException {
 
 		Files.lines(Paths.get(homepageAfterLogin)).forEach(System.out::println);
 
@@ -51,9 +50,10 @@ public class LoggedHomePage {
 				option = scanner.nextInt();
 
 				switch (option) {
-				case 7 -> wardrobeFactory.addItemToTheWardrobe(sessionID); // change method to accept sessionID instead
-																			// of userID
-
+				case 7 -> {
+					wardrobeFactory.addItemToTheWardrobe(userID);
+					Files.lines(Paths.get(homepageAfterLogin)).forEach(System.out::println);
+				}
 				case 8 -> {
 					System.out.println("Enter item id:");
 					long itemId = scanner.nextLong();

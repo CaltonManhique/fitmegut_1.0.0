@@ -109,7 +109,7 @@ public class Registration {
 		System.out.println("Enter first name:");
 		String firstName = scanner.nextLine();
 
-		System.out.println("Enter first name:");
+		System.out.println("Enter last name:");
 		String lastName = scanner.nextLine();
 
 		System.out.println("Enter nickname:");

@@ -3,31 +3,53 @@ package com.fitmegut.warehousefinalproject.model;
 public class Item {
 
 	private long itemId;
+	private String itemName;
 	private ClothingCategory clothingCategories; // dropdown list
 	private String itemBrand;
 	private String size;
 	private String color;
-	private String status; // New/...
+	private ItemCondition itemCondition; // New/...
 	private String description;
+	private boolean posted;
 
 	public Item(long itemId, ClothingCategory clothingCategories, String itemBrand, String size, String color,
-			String status, String description) {
+			ItemCondition itemCondition, String description, boolean posted) {
 		this.itemId = itemId;
 		this.clothingCategories = clothingCategories;
 		this.itemBrand = itemBrand;
 		this.size = size;
 		this.color = color;
-		this.status = status;
+		this.itemCondition = itemCondition;
 		this.description = description;
+		this.posted = posted;
 	}
 
+	public Item(long itemId, String itemName, ClothingCategory clothingCategories, String itemBrand, String size,
+			String color, ItemCondition itemCondition, String description, boolean posted) {
+		this.itemId = itemId;
+		this.itemName = itemName;
+		this.clothingCategories = clothingCategories;
+		this.itemBrand = itemBrand;
+		this.size = size;
+		this.color = color;
+		this.itemCondition = itemCondition;
+		this.description = description;
+		this.posted = posted;
+	}
 
 	public Item() {
 	}
 
-
 	public long getItemId() {
 		return itemId;
+	}
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
 	}
 
 	public void setItemId(long itemId) {
@@ -38,11 +60,9 @@ public class Item {
 		return itemBrand;
 	}
 
-
 	public void setItemBrand(String itemBrand) {
 		this.itemBrand = itemBrand;
 	}
-
 
 	public ClothingCategory getClothingCategories() {
 		return clothingCategories;
@@ -68,12 +88,12 @@ public class Item {
 		this.color = color;
 	}
 
-	public String getStatus() {
-		return status;
+	public ItemCondition getItemCondition() {
+		return itemCondition;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setItemCondition(ItemCondition status) {
+		this.itemCondition = status;
 	}
 
 	public String getDescription() {
@@ -84,12 +104,18 @@ public class Item {
 		this.description = description;
 	}
 
+	public boolean isPosted() {
+		return posted;
+	}
+
+	public void setPosted(boolean posted) {
+		this.posted = posted;
+	}
 
 	@Override
 	public String toString() {
-		return "Item Id: " + itemId + ", " + clothingCategories + ", " + itemBrand
-				+ ", size " + size + ", " + color + ", " + status + ", description: " + description + "]";
+		return "Item Id: " + itemId + ", " + clothingCategories + ", " + itemBrand + ", size " + size + ", " + color
+				+ ", " + itemCondition + ", description: " + description + "]";
 	}
 
-	
 }

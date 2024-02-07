@@ -38,8 +38,14 @@ public class HomePage {
 
 					if (str.equalsIgnoreCase("success")) {
 
-						System.out.println(str);
 						System.out.println("Sign in to access more features.");
+						
+						try {
+							Files.lines(Paths.get(homepage)).forEach(System.out::println);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
 					} else {
 						System.out.println(str);
 					}

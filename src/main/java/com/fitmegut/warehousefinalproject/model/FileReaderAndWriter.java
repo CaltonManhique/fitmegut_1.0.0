@@ -169,7 +169,8 @@ public class FileReaderAndWriter {
 		CSVWriter writer = new CSVWriter(outputFile);
 
 		String[] data = { String.valueOf(item.getItemId()), item.getClothingCategories().toString(),
-				item.getItemBrand(), item.getSize(), item.getColor(), item.getStatus(), item.getDescription() };
+				item.getItemBrand(), item.getSize(), item.getColor(), item.getItemCondition().toString(),
+				item.getDescription(), "false" };
 		writer.writeNext(data);
 
 		writer.close();
@@ -186,7 +187,7 @@ public class FileReaderAndWriter {
 		while ((nextLine = reader.readNext()) != null) {
 
 			Item item = new Item(Long.parseLong(nextLine[0]), ClothingCategory.valueOf(nextLine[1]), nextLine[2],
-					nextLine[3], nextLine[4], nextLine[5], nextLine[6]);
+					nextLine[3], nextLine[4], ItemCondition.valueOf(nextLine[5]), nextLine[6], false);
 			arr.add(item);
 		}
 
