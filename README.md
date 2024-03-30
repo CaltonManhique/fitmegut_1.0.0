@@ -1,4 +1,4 @@
-# fitmegut
+# fitmegut 1.0.0
 Clothing donation &amp; exchange - community website that allows members to give new life to their unwanted clothes, reducing waste and helping those in need.
 
 ## “Nothing is old, it's all about how you look at things”
